@@ -1,0 +1,55 @@
+{% extends "bootstrap_ui/bootstrap-skeleton.html" %}
+{% include 'bootstrap_ui/listgroup.html' with type='list' items=items only %}
+{% load bootstrap_ui_tags %}
+
+<!-- head-meta section -->
+{% block head-meta %}
+{{ block.super }}
+
+{% endblock %}
+
+<!-- head-title -->
+{% block head-title %}
+{% if app_details %}
+{{ app_details.name }}
+{% endif %}
+
+{% endblock %}
+
+<!-- head-css -->
+{% block head-css %}
+{{ block.super }}
+
+{% endblock %}
+
+<!-- head-js -->
+{% block head-javascript %}
+{{ block.super }}
+
+{% endblock %}
+
+<!-- head-ex -->
+{% block head-extension %}
+{{ block.super }}
+
+{% endblock %}
+
+<!-- body -->
+{% block body-content %}
+{{ block.super }}
+
+{% listgroup %}
+  {% listgroupitem %}
+   Item1
+  {% endlistgroupitem %}
+  {% listgroupitem %}
+   Item2
+  {% endlistgroupitem %}
+ {% endlistgroup %}
+{% endblock %}
+
+<!-- body-js -->
+{% block body-javascript %}
+{{ block.super }}
+
+{% endblock %}

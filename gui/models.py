@@ -10,6 +10,7 @@ class ApplicationModel(iot.BaseModel):
     version = models.CharField(max_length=20)
     url = models.CharField(max_length=255)
     company = models.CharField(max_length=255)
+    selected_template = models.ForeignKey('TemplateModel', models.SET_NULL, blank=True, null=True)
 
 class Layout(iot.BaseModel):
     pass

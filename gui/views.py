@@ -8,5 +8,6 @@ from . import models
 
 def index(request):
     app_details = models.ApplicationModel.objects.get(id=1)
+    template = models.TemplateModel.objects.get(id=1000)
     context = { 'app_details' : app_details, }
-    return render(request, 'gui/index.html', context)
+    return render(request, template.template_path, context)
