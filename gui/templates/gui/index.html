@@ -41,55 +41,20 @@
 1. 'footer-fixed'		- Fixed footer
 
 -->
-
-<body class="app">
+  <body class="app header-fixed sidebar-fixed aside-menu-fixed aside-menu-hidden">
   <header class="app-header navbar">
-    <button class="navbar-toggler mobile-sidebar-toggler d-lg-none" type="button">☰</button>
+    <button class="navbar-toggler mobile-sidebar-toggler d-lg-none mr-auto" type="button">
+      <span class="navbar-toggler-icon"></span>
+    </button>
     <a class="navbar-brand" href="#"></a>
-    <ul class="nav navbar-nav d-md-down-none">
-      <li class="nav-item">
-        <a class="nav-link navbar-toggler sidebar-toggler" href="#">☰</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">...</a>
-      </li>
-    </ul>
+    <button class="navbar-toggler sidebar-toggler d-md-down-none" type="button">
+      <span class="navbar-toggler-icon"></span>
+    </button>
   </header>
-  <div class="app-body">
-    <div class="sidebar">
-      <nav class="sidebar-nav">
-        <ul class="nav">
-          <li class="nav-item">
-            <a class="nav-link" href="index.html"><i class="icon-speedometer"></i> Dashboard <span class="badge badge-info">NEW</span></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="...">...</a>
-          </li>
-        </ul>
-      </nav>
-    </div>
-
-    <!-- Main content -->
-    <main class="main">
-      <!-- Breadcrumb -->
-      <ol class="breadcrumb">
-        ...
-      </ol>
-      <div class="container-fluid">
-        <div id="ui-view"></div>
-      </div>
-    </main>
-
-    <aside class="aside-menu">
-      ...
-    </aside>
-
-  </div>
-
   <footer class="app-footer">
-    ...
+    <span><a href="http://coreui.io">CoreUI</a> &copy; 2017 creativeLabs.</span>
+    <span class="ml-auto">Powered by <a href="http://coreui.io">CoreUI</a></span>
   </footer>
-
   <!-- Bootstrap and necessary plugins -->
   <script
   src="https://code.jquery.com/jquery-3.2.1.min.js"
