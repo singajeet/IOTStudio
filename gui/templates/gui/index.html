@@ -1,4 +1,5 @@
 {% load static %}
+{% load gui_tags %} 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,7 +11,7 @@
   <meta name="keyword" content="Bootstrap,Admin,Template,Open,Source,AngularJS,Angular,Angular2,jQuery,CSS,HTML,RWD,Dashboard">
   <link rel="shortcut icon" href="{% static 'img/favicon.png' %}">
 
-  <title>{% if app_details %}{{ app_details.name }}{% endif %}</title>
+  <title>{% title app_details.name %}</title>
 
   <!-- Icons -->
   <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet">
@@ -18,6 +19,9 @@
 
   <!-- Main styles for this application -->
   <link href="{% static 'css/style.css' %}" rel="stylesheet">
+
+  <!-- using custom tags -->
+  {% style 'default_style' %}
 </head>
 
 <!-- BODY options, add following classes to body to change options
