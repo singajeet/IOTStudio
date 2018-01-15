@@ -31,7 +31,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-	'bootstrap_ui',
 	'gui.apps.GuiConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -120,8 +119,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
-
-DJANGO_BOOTSTRAP_UI_THEME = 'bootswatch-paper'
 
 # Add these new lines
 STATICFILES_DIRS = (

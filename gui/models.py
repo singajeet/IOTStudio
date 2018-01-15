@@ -1,19 +1,18 @@
-# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
 from django.db import models
 from .gui_models import iot
 from datetime import datetime
 from django.contrib.auth.models import User
-
+from IOTStudio.settings import BASE_DIR
+import os
 
 # Create your models here.
 class ApplicationModel(iot.BaseModel):    
-    version = models.CharField(max_length=20)
-    url = models.CharField(max_length=255)
-    company = models.CharField(max_length=255)
+    version = models.CharField(max_length=20, blank=True, null=True)
+    url = models.URLField(max_length=255, blank=True, null=True)
+    company = models.CharField(max_length=255, blank=True, null=True)
     selected_template = models.ForeignKey('TemplateModel', models.SET_NULL, blank=True, null=True)
-    author = models.ForeignKey(User)
+    author = models.ForeignKey(User, blank=True, null=True)
     class Meta:
         verbose_name_plural = "Applications"
         verbose_name = "Application"
@@ -30,7 +29,7 @@ class ControlModel(UIElementModel):
 
 class TemplateModel(iot.BaseModel):    
     template_type = models.CharField(max_length=255)
-    template_path = models.CharField(max_length=255)
+    template_path = models.FilePathField(path=os.path.join(BASE_DIR, 'gui/templates'), recursive=True, allow_folders=False, blank=True, null=True)
     template_applied_on = models.ForeignKey(ControlModel, models.SET_NULL, blank=True, null=True)
     author = models.ForeignKey(User, models.SET_NULL, blank = True, null = True)
     class Meta:
@@ -39,7 +38,7 @@ class TemplateModel(iot.BaseModel):
 
 class StyleModel(iot.BaseModel):    
     style_type = models.CharField(max_length=255)
-    style_path = models.CharField(max_length=255)
+    style_path = models.FilePathField(path=os.path.join(BASE_DIR, 'staticfiles/css'), recursive=True, allow_folders=False, blank=True, null=True)
     style_applied_on = models.ForeignKey(ControlModel, models.SET_NULL, blank = True, null = True)
     author = models.ForeignKey(User, models.SET_NULL, blank = True, null = True)
     class Meta:

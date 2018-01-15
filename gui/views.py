@@ -7,7 +7,7 @@ from . import models
 # Create your views here.
 
 def index(request):
-    app_details = models.ApplicationModel.objects.get(id=1)
-    template = models.TemplateModel.objects.get(id=1000)
+    app_details = models.ApplicationModel.objects.get(id=2)
+    template = models.TemplateModel.objects.get(id=app_details.selected_template.id)
     context = { 'app_details' : app_details, }
-    return render(request, template.template_path, context)
+    return render(request, template.template_path.lstrip('\\'), context)
