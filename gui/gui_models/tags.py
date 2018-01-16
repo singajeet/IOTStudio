@@ -16,6 +16,10 @@ class HtmlTag(models.Model):
     modified_on_date = models.DateTimeField(auto_now = True, editable = False)
     author = models.ForeignKey(User, blank=True, null=True)
     security_id = models.ForeignKey(iot.SecurityIdModel, models.SET_NULL, blank = True, null = True)
+    
+    def __str__(self):
+        return self.tag_name
+        
 
 class StyleTag(models.Model):
     STYLE_TYPES=(
@@ -32,6 +36,10 @@ class StyleTag(models.Model):
     modified_on_date = models.DateTimeField(auto_now = True, editable = False)
     author = models.ForeignKey(User, blank=True, null=True)
     security_id = models.ForeignKey(iot.SecurityIdModel, models.SET_NULL, blank = True, null = True)
+    
+    def __str__(self):
+        return self.tag_name
+        
 
 class ScriptTag(models.Model):
     SCRIPT_TYPES=(
@@ -50,6 +58,10 @@ class ScriptTag(models.Model):
     modified_on_date = models.DateTimeField(auto_now = True, editable = False)
     author = models.ForeignKey(User, blank=True, null=True)
     security_id = models.ForeignKey(iot.SecurityIdModel, models.SET_NULL, blank = True, null = True)
+    
+    def __str__(self):
+        return self.tag_name
+        
 
 class IconTag(models.Model):
     ICON_TYPES = (
@@ -66,3 +78,7 @@ class IconTag(models.Model):
     modified_on_date = models.DateTimeField(auto_now = True, editable = False)
     author = models.ForeignKey(User, blank=True, null=True)
     security_id = models.ForeignKey(iot.SecurityIdModel, models.SET_NULL, blank = True, null = True)
+    
+    def __str__(self):
+        return self.tag_name
+        

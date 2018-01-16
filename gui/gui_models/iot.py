@@ -23,3 +23,6 @@ class SecurityIdModel(models.Model):
     value = models.CharField(max_length=255)
     created_on_date = models.DateTimeField(auto_now_add = True, editable = False)
     modified_on_date = models.DateTimeField(auto_now = True, editable = False)
+    
+    def __str__(self):
+        return self.name
