@@ -27,7 +27,18 @@ SET /P confirm="Continue with push command [y/n]>"
 IF "%confirm%"=="y" (
 
 git commit -m "%commit_msg%"
+
+IF /I "%ERRORLEVEL%" NEQ "0" (
+	ECHO "ERROR: while commiting changes to repository!"
+	EXIT /B 1
+)
+
 git push origin master
+
+IF /I "%ERRORLEVEL%" NEQ "0" (
+	ECHO "ERROR: while pushing files to remote!"
+	EXIT /B 1
+)
 
 ECHO "File(s) pushed to github successfully!"
 ) else (
