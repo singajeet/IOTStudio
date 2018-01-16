@@ -33,7 +33,7 @@ IF /I "%ERRORLEVEL%" NEQ "0" (
 	EXIT /B 1
 )
 
-git push origin master
+git push
 
 IF /I "%ERRORLEVEL%" NEQ "0" (
 	ECHO "ERROR: while pushing files to remote!"
