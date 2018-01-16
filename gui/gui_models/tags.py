@@ -38,10 +38,12 @@ class ScriptTag(models.Model):
             ('-1', 'None'),
             ('00', 'File'),
             ('01', 'Inline'),
+            ('02', 'Url'),
             )
     id = models.AutoField(primary_key=True)
     tag_name = models.CharField(max_length=255, unique = True)
-    script_type = models.CharField(max_length = 2, choices=SCRIPT_TYPES, default='00')
+    script_type = models.CharField(max_length = 2, choices=SCRIPT_TYPES, default='02')
+    script_url = models.URLField(max_length=255, blank=True, null=True, help_text='Url to CDN location')
     script_file = models.FilePathField(path=os.path.join(BASE_DIR, 'staticfiles/js'), recursive=True, allow_folders=False, blank=True, null=True)
     script_text = models.TextField(blank=True, null=True)
     created_on_date = models.DateTimeField(auto_now_add = True, editable = False)
@@ -49,3 +51,18 @@ class ScriptTag(models.Model):
     author = models.ForeignKey(User, blank=True, null=True)
     security_id = models.ForeignKey(iot.SecurityIdModel, models.SET_NULL, blank = True, null = True)
 
+class IconTag(models.Model):
+    ICON_TYPES = (
+        ('-1', 'None'),
+        ('00', 'File'),
+        ('01', 'Inline'),
+    )
+    id = models.AutoField(primary_key=True)
+    tag_name = models.CharField(max_length=255, unique = True)
+    icon_type = models.CharField(max_length = 2, choices=ICON_TYPES, default='00')
+    icon_file = models.FilePathField(path=os.path.join(BASE_DIR, 'staticfiles/img'), recursive=True, allow_folders=False, blank=True, null=True)
+    icon_text = models.TextField(blank=True, null=True)
+    created_on_date = models.DateTimeField(auto_now_add = True, editable = False)
+    modified_on_date = models.DateTimeField(auto_now = True, editable = False)
+    author = models.ForeignKey(User, blank=True, null=True)
+    security_id = models.ForeignKey(iot.SecurityIdModel, models.SET_NULL, blank = True, null = True)
