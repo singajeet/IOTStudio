@@ -28,8 +28,14 @@ class ControlModel(UIElementModel):
     parent_id = models.ForeignKey('self', models.SET_NULL, blank=True, null=True)
 
 class TemplateModel(iot.BaseModel):    
-    template_type = models.CharField(max_length=255)
+    TEMPLATE_TYPES=(
+            ('-1', 'None'),
+            ('00', 'File'),
+            ('01', 'Runtime'),
+            )
+    template_type = models.CharField(max_length=2, choices=TEMPLATE_TYPES, default='00')
     template_path = models.FilePathField(path=os.path.join(BASE_DIR, 'gui/templates'), recursive=True, allow_folders=False, blank=True, null=True)
+    meta_tags = models.ManyToManyField(tags.HtmlField, related_name='+', limit_choices_to={'tag_name__contains':'Meta'})
     template_applied_on = models.ForeignKey(ControlModel, models.SET_NULL, blank=True, null=True)
     author = models.ForeignKey(User, models.SET_NULL, blank = True, null = True)
     class Meta:
