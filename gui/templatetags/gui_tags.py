@@ -24,8 +24,11 @@ def title(title_text):
 def style(style_name):
     if style_name is not None:
         style_tag = get_object_or_404(tags.StyleTag, tag_name=style_name)
-        if style_tag is not None:
-            return format_html('<link href="{0}" rel="stylesheet" />'.format(static(style_tag.style_text)))
+        if style_tag is not None and style_tag.style_type == '00':
+            return format_html('<link href="css{0}" rel="stylesheet" />'.format(static(style_tag.style_file)))
+        
+        if style_tag is not None and style_tag.style_type == '01':
+            return format_html('<style>{0}</style>'.format(style_tag.style_text))
             
     return None
     
@@ -33,7 +36,10 @@ def style(style_name):
 def script(script_name):
     if script_name is not None:
         script_tag = get_object_or_404(tags.ScriptTag, tag_name=script_name)
-        if script_tag is not None:
-            return format_html('<script src="{0}" type="application/javascript" />' . format(static(script_tag.script_text)))
+        if script_tag is not None and script_tag.script_type == '01':
+            return format_html('<script src="js{0}" type="application/javascript" />' . format(static(script_tag.script_file)))
+
+        if script_tag is not None and script_tag.script_type == '00':
+            return format_html('<script>{0}</script>'.format(script_tag.script_text))
 
     return None
