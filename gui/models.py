@@ -7,6 +7,7 @@ from IOTStudio.settings import BASE_DIR
 from .gui_models import tags
 import os
 
+
 # Create your models here.
 class ApplicationModel(iot.BaseModel):    
     version = models.CharField(max_length=20, blank=True, null=True)
@@ -40,12 +41,12 @@ class PanelModel(UIElementModel):
             ('06', 'FlyoutPanel'),
             )
     panel_type = models.CharField(max_length=2, blank = True, choices = PANEL_TYPES, default = '-1')
-    parent_id = models.ForeignKey('self', models.SET_NULL, blank = True)
+    parent_id = models.ForeignKey('self', models.SET_NULL, blank = True, null = True)
     children = models.ManyToManyField(UIElementModel, blank = True, related_name = '+', default = None) 
-    author = models.ForeignKey(User, models.SET_NULL, blank = True)
+    author = models.ForeignKey(User, models.SET_NULL, blank = True, null = True)
 
     def __str__(self):
-        return '{0} ({1})'.format(self.name, self.panel_type)
+        return '{0} ({1})'.format(self.name, dict(self.PANEL_TYPES)[self.panel_type])
 
     class Meta:
         verbose_name = 'Panel'
@@ -62,17 +63,17 @@ class PlaceHolderModel(iot.BaseModel):
             ('01', 'Panel'),
             )
     place_holder_type = models.CharField(max_length=2, choices = PLACE_HOLDER_TYPES, default='00')
-    author = models.ForeignKey(User, models.SET_NULL, blank = True)
+    author = models.ForeignKey(User, models.SET_NULL, blank = True, null = True)
 
     def __str__(self):
-        return '{0} ({1})'.format(self.name, place_holder_type)
+        return '{0} ({1})'.format(self.name, dict(self.PLACE_HOLDER_TYPES)[self.place_holder_type])
 
     class Meta:
         verbose_name = 'Placeholder'
         verbose_name_plural = 'Placeholders'
 
 class HtmlPlaceHolderModel(PlaceHolderModel):
-    html_tags = models.ManyToManyField(tags.HtmlTag, blank = True, related_name = '+', default = None)
+    html_tags = models.ManyToManyField(tags.HtmlTagModel, blank = True, related_name = '+', default = None)
 
     def __str__(self):
         return '{0} (HtmlPlaceholder)'.format(self.name)
@@ -82,7 +83,7 @@ class HtmlPlaceHolderModel(PlaceHolderModel):
         verbose_name_plural = 'HtmlPlaceholders'
 
 class PanelPlaceHolderModel(PlaceHolderModel):
-        panels = models.ManyToManyField(PanelModel, blank = True, related_name = '+', default = 'None')
+    panels = models.ManyToManyField(PanelModel, blank = True, related_name = '+', default = None)
 
     def __str__(self):
         return '{0} (PanelPlaceholder)'.format(self.name)
@@ -93,7 +94,7 @@ class PanelPlaceHolderModel(PlaceHolderModel):
 
 class SectionModel(iot.BaseModel):
     place_holders = models.ManyToManyField(PlaceHolderModel, blank = True, related_name = '+', default = None, help_text = 'Each section consist of 0 or more place holders of type HTML or panel')
-    author = models.ForeignKey(User, models.SET_NULL, blank = True)
+    author = models.ForeignKey(User, models.SET_NULL, blank = True, null = True)
 
     def __str__(self):
         return self.name
@@ -122,18 +123,18 @@ class TemplateModel(iot.BaseModel):
             )
     template_type = models.CharField(max_length=2, choices=TEMPLATE_TYPES, default='00')
     template_path = models.FilePathField(path=os.path.join(BASE_DIR, 'gui/templates'), recursive=True, allow_folders=False, blank=True, null=True)
-    meta_tags = models.ManyToManyField(tags.HtmlTag, related_name='+', blank=True, default=None, limit_choices_to={'tag_name__contains':'Meta'})
-    page_icon_tag = models.ForeignKey(tags.IconTag, models.SET_NULL, blank = True, null = True, default=None)
-    title_tag = models.ForeignKey(tags.HtmlTag, models.SET_NULL, blank = True, null = True, default=None, limit_choices_to={'tag_name__contains':'Title'})
-    header_script_tags = models.ManyToManyField(tags.ScriptTag, blank=True, default=None, related_name='+')
-    header_style_tags = models.ManyToManyField(tags.StyleTag, blank=True, related_name='+', default=None)
-   block_tags = models.ManyToManyField(TemplateBlockModel, blank = True, related_name='+', default=None)
-   template_applied_on = models.ForeignKey(ControlModel, models.SET_NULL, blank=True, null=True)
+    meta_tags = models.ManyToManyField(tags.HtmlTagModel, related_name='+', blank=True, default=None, limit_choices_to={'tag_name__contains':'Meta'})
+    page_icon_tag = models.ForeignKey(tags.IconTagModel, models.SET_NULL, blank = True, null = True, default=None)
+    title_tag = models.ForeignKey(tags.HtmlTagModel, models.SET_NULL, blank = True, null = True, default=None, limit_choices_to={'tag_name__contains':'Title'})
+    header_script_tags = models.ManyToManyField(tags.ScriptTagModel, blank=True, default=None, related_name='+')
+    header_style_tags = models.ManyToManyField(tags.StyleTagModel, blank=True, related_name='+', default=None)
+    block_tags = models.ManyToManyField(TemplateBlockModel, blank = True, related_name='+', default=None)
+    template_applied_on = models.ForeignKey(ControlModel, models.SET_NULL, blank=True, null=True)
     author = models.ForeignKey(User, models.SET_NULL, blank = True, null = True)
     
     def __str__(self):
-        return '{0} ({1})'.format(self.name, self.template_type)
-        
+        return '{0} ({1})'.format(self.name, dict(self.TEMPLATE_TYPES)[self.template_type])
+
     class Meta:
         verbose_name = "Template"
         verbose_name_plural = "Templates"
@@ -150,7 +151,7 @@ class ControlStyleModel(iot.BaseModel):
     author = models.ForeignKey(User, models.SET_NULL, blank = True, null = True)
     
     def __str__(self):
-        return '{0} ({1})'.format(self.name, style_type)
+        return '{0} ({1})'.format(self.name, dict(self.STYLES)[self.style_type])
         
     class Meta:
         verbose_name = 'ControlStyle'
@@ -158,7 +159,7 @@ class ControlStyleModel(iot.BaseModel):
 
 class ContentControlModel(ControlModel):        
     template = models.ForeignKey(TemplateModel, models.SET_NULL, blank = True, null = True)
-    style = models.ForeignKey(StyleModel, models.SET_NULL, blank = True, null = True)
+    style = models.ForeignKey(ControlStyleModel, models.SET_NULL, blank = True, null = True)
     content = models.ForeignKey('self', models.SET_NULL, blank = True, null = True)
     author = models.ForeignKey(User, models.SET_NULL, blank = True, null = True)
     

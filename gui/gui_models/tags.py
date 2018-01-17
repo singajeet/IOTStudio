@@ -5,10 +5,13 @@ from datetime import datetime
 from django.contrib.auth.models import User
 import os
 from IOTStudio.settings import BASE_DIR
+from IOTStudio.settings import STATIC_ROOT
+from django.utils.html import format_html
+from django.templatetags.static import static
 from . import iot
 
 
-class HtmlTag(models.Model):
+class HtmlTagModel(models.Model):
     id = models.AutoField(primary_key=True)
     tag_name = models.CharField(max_length=255, unique = True)
     tag_text = models.TextField()
@@ -20,8 +23,11 @@ class HtmlTag(models.Model):
     def __str__(self):
         return self.tag_name
         
+    def get_html(self):
+        return format_html('\n\t<!-- {0} -->\n\t{1}'.format(self.tag_name, self.tag_text))
+        
 
-class StyleTag(models.Model):
+class StyleTagModel(models.Model):
     STYLE_TYPES=(
             ('-1', 'None'),
             ('00', 'File'),
@@ -38,10 +44,20 @@ class StyleTag(models.Model):
     security_id = models.ForeignKey(iot.SecurityIdModel, models.SET_NULL, blank = True, null = True)
     
     def __str__(self):
-        return self.tag_name
+        return '{0} ({1})'.format(self.tag_name, dict(self.STYLE_TYPES)[self.style_type])
+        
+    def get_html(self):
+        if self.style_type == '00':
+            file_name = self.style_file.replace(STATIC_ROOT, '')            
+            return format_html('\n\t<!-- {0} -->\n\t<link href="{1}" rel="stylesheet" />'.format(self.tag_name, static(file_name)))
+        
+        if self.style_type == '01':
+            return format_html('\n\t<!-- {0} -->\n\t<style>\n\t{1}\n\t</style>'.format(self.tag_name, self.style_text))
+            
+        return None
         
 
-class ScriptTag(models.Model):
+class ScriptTagModel(models.Model):
     SCRIPT_TYPES=(
             ('-1', 'None'),
             ('00', 'File'),
@@ -60,10 +76,23 @@ class ScriptTag(models.Model):
     security_id = models.ForeignKey(iot.SecurityIdModel, models.SET_NULL, blank = True, null = True)
     
     def __str__(self):
-        return self.tag_name
+        return '{0} ({1})'.format(self.tag_name, dict(self.SCRIPT_TYPES)[self.script_type])
+        
+    def get_html(self):
+        if self.script_type == '00':
+            file_name = self.script_file.replace(STATIC_ROOT, '')
+            return format_html('\n\t<!-- {0} -->\n\t<script src="{1}" type="application/javascript"></script>' . format(self.tag_name, static(file_name)))
+
+        if self.script_type == '01':
+            return format_html('\n\t<!-- {0} -->\n\t<script>\n\t{1}\n\t</script>'.format(self.tag_name, self.script_text))
+            
+        if self.script_type == '02':
+            return format_html('\n\t<!-- {0} -->\n\t<script src="{1}" type="application/javascript"></script>' . format(self.tag_name, self.script_url))
+
+        return None
         
 
-class IconTag(models.Model):
+class IconTagModel(models.Model):
     ICON_TYPES = (
         ('-1', 'None'),
         ('00', 'File'),
@@ -80,5 +109,16 @@ class IconTag(models.Model):
     security_id = models.ForeignKey(iot.SecurityIdModel, models.SET_NULL, blank = True, null = True)
     
     def __str__(self):
-        return self.tag_name
+        return '{0} ({1})'.format(self.tag_name, dict(self.ICON_TYPES)[self.icon_type])
+        
+    def get_html(self, for_element):
+        if for_element == 'page_icon':
+            if self.icon_type == '00':
+                file_name = self.icon_file.replace(STATIC_ROOT, '')
+                return format_html('\n\t<!-- {0} -->\n\t<link rel="shortcut icon" href="{1}" />'.format(self.tag_name, static(file_name)))
+    
+            if self.icon_type == '01':
+                return format_html('\n\t<!-- {0} -->\n\t{1}'.format(self.tag_name, self.icon_text))
+                
+        return None
         

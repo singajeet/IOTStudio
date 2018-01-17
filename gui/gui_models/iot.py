@@ -25,4 +25,4 @@ class SecurityIdModel(models.Model):
     modified_on_date = models.DateTimeField(auto_now = True, editable = False)
     
     def __str__(self):
-        return self.name
+        return '{0} ({1})'.format(self.name, dict(self.OBJECT_TYPES)[self.type])

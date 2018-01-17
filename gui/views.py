@@ -37,24 +37,30 @@ def index(request):
         html += utilities.get_all_meta_tags_html(template.meta_tags) + NEW_LINE
         
         #Render page-icon-tag
-        html += utilities.get_page_icon_html(template.page_icon_tag) + NEW_LINE
+        html += template.page_icon_tag.get_html('page_icon') + NEW_LINE
         
         #Render title-tag 
-        html += utilities.get_title_tag_html(template.title_tag) + NEW_LINE
+        html += template.title_tag.get_html() + NEW_LINE
         
         #Render header-script-tags
         html += utilities.get_all_script_tags_html(template.header_script_tags) + NEW_LINE
         
         #Render header-style-tags
-        html += utilities.get_all_style_tags_html(template.header_style_tags)
+        html += utilities.get_all_style_tags_html(template.header_style_tags) + NEW_LINE
         
-        
+        #End Head tag
         html += HEAD_END
+        
+        #Body start tag
         html += BODY_START
         
-        html += utilities.get_all_script_tags_html(template.header_script_tags) + NEW_LINE
+        #Body end tag
         html += BODY_END
+        
+        #HTML end tag
         html += HTML_END
+        
+        #Compose template using context and return rendered HTML
         html_template = Template(html)
         html_context = Context(context)
         return HttpResponse(html_template.render(html_context))
