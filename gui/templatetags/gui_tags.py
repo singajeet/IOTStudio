@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 from ..gui_models import tags
 from django import template
 from django.shortcuts import get_object_or_404
-from .. import utilities
 from .. import models
 
 register = template.Library()

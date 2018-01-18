@@ -7,6 +7,14 @@ from IOTStudio.settings import BASE_DIR
 from .gui_models import tags
 import os
 
+TEMPLATE_NAME = '<!-- Template Name: {0} -->'
+NEW_LINE = '\n'
+HTML_START = '<!DOCTYPE html>' + NEW_LINE + '<html lang="en">' + NEW_LINE
+HTML_END = '</html>' + NEW_LINE
+HEAD_START = '<head>' + NEW_LINE
+HEAD_END = '</head>' + NEW_LINE
+BODY_START = '<body>' + NEW_LINE
+BODY_END = '</body>' + NEW_LINE
 
 # Create your models here.
 class ApplicationModel(iot.BaseModel):    
@@ -47,6 +55,9 @@ class PanelModel(UIElementModel):
 
     def __str__(self):
         return '{0} ({1})'.format(self.name, dict(self.PANEL_TYPES)[self.panel_type])
+        
+    def get_html():
+        pass
 
     class Meta:
         verbose_name = 'Panel'
@@ -68,6 +79,9 @@ class PlaceHolderModel(iot.BaseModel):
     def __str__(self):
         return '{0} ({1})'.format(self.name, dict(self.PLACE_HOLDER_TYPES)[self.place_holder_type])
 
+    def get_html():
+        pass
+        
     class Meta:
         verbose_name = 'Placeholder'
         verbose_name_plural = 'Placeholders'
@@ -77,6 +91,13 @@ class HtmlPlaceHolderModel(PlaceHolderModel):
 
     def __str__(self):
         return '{0} (HtmlPlaceholder)'.format(self.name)
+        
+    def get_html():
+        html = ''
+        for html_tag in html_tags:
+            html += html_tag.get_html()
+            
+        return html
 
     class Meta:
         verbose_name = 'HtmlPlaceholder'
@@ -88,6 +109,13 @@ class PanelPlaceHolderModel(PlaceHolderModel):
     def __str__(self):
         return '{0} (PanelPlaceholder)'.format(self.name)
 
+    def get_html():
+        html = ''
+        for panel in panels:
+            html += panel.get_html()
+            
+        return html
+        
     class Meta:
         verbose_name = 'PanelPlaceholder'
         verbose_name_plural = 'PanelPlaceholders'
@@ -98,6 +126,13 @@ class SectionModel(iot.BaseModel):
 
     def __str__(self):
         return self.name
+        
+    def get_html():
+        html = ''
+        for place_holder in place_holders:
+            html += place_holder.get_html()
+            
+        return html
 
     class Meta:
         verbose_name = 'Section'
@@ -111,6 +146,13 @@ class TemplateBlockModel(iot.BaseModel):
     def __str__(self):
         return self.name
 
+    def get_html():
+        html = ''
+        for section in sections:
+            html += section.get_html()
+            
+        return html
+        
     class Meta:
         verbose_name = 'Block'
         verbose_name_plural = 'Blocks'
@@ -135,6 +177,55 @@ class TemplateModel(iot.BaseModel):
     def __str__(self):
         return '{0} ({1})'.format(self.name, dict(self.TEMPLATE_TYPES)[self.template_type])
 
+    def get_html(self, request, context):
+        if self.template_type == '00':
+            return shortcuts.render(request, self.template_path.lstrip('\\'), context)
+        
+        if self.template_type == '01':
+            #start HTML tag
+            html = TEMPLATE_NAME.format(self.name)
+            html += HTML_START        
+            #start Head tag
+            html += HEAD_START        
+            #Render all meta tags if available        
+            for meta_tag in self.meta_tags.all():
+                html += meta_tag.get_html()
+                
+            html += NEW_LINE
+            
+            #Render page-icon-tag
+            html += self.page_icon_tag.get_html('page_icon') + NEW_LINE        
+            #Render title-tag 
+            html += self.title_tag.get_html() + NEW_LINE        
+            #Render header-script-tags        
+            for script_tag in self.header_script_tags.all():
+                html += script_tag.get_html()
+                
+            html += NEW_LINE
+            
+            #Render header-style-tags        
+            for style_tag in self.header_style_tags.all():
+                html += style_tag.get_html()
+            
+            html += NEW_LINE
+            
+            #End Head tag
+            html += HEAD_END        
+            #Body start tag
+            html += BODY_START        
+            #Render all blocks        
+            for block_tag in self.block_tags.all():
+                html += block_tag.get_html()
+            
+            html += NEW_LINE
+            
+            #Body end tag
+            html += BODY_END        
+            #HTML end tag
+            html += HTML_END
+            
+        return html
+        
     class Meta:
         verbose_name = "Template"
         verbose_name_plural = "Templates"
