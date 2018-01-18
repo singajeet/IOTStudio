@@ -25,6 +25,10 @@ class HtmlTagModel(models.Model):
         
     def get_html(self):
         return format_html('\n\t<!-- {0} -->\n\t{1}'.format(self.tag_name, self.tag_text))
+
+    class Meta:
+        verbose_name ='HtmlTag'
+        verbose_name_plural = 'HtmlTags'
         
 
 class StyleTagModel(models.Model):
@@ -55,6 +59,10 @@ class StyleTagModel(models.Model):
             return format_html('\n\t<!-- {0} -->\n\t<style>\n\t{1}\n\t</style>'.format(self.tag_name, self.style_text))
             
         return None
+
+    class Meta:
+        verbose_name = 'StyleTag'
+        verbose_name_plural = 'StyleTags'
         
 
 class ScriptTagModel(models.Model):
@@ -90,8 +98,12 @@ class ScriptTagModel(models.Model):
             return format_html('\n\t<!-- {0} -->\n\t<script src="{1}" type="application/javascript"></script>' . format(self.tag_name, self.script_url))
 
         return None
-        
 
+    class Meta:
+        verbose_name = 'ScriptTag'
+        verbose_name_plural = 'ScriptTags'
+
+        
 class IconTagModel(models.Model):
     ICON_TYPES = (
         ('-1', 'None'),
@@ -121,4 +133,8 @@ class IconTagModel(models.Model):
                 return format_html('\n\t<!-- {0} -->\n\t{1}'.format(self.tag_name, self.icon_text))
                 
         return None
+
+    class Meta:
+        verbose_name = 'IconTag'
+        verbose_name_plural = 'IconTags'
         

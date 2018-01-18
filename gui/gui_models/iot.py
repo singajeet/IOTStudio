@@ -1,8 +1,8 @@
 from django.db import models
 from datetime import datetime
+from polymorphic.models import PolymorphicModel
 
-
-class BaseModel(models.Model):
+class BaseModel(PolymorphicModel):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255, unique = True)
     created_on_date = models.DateTimeField(auto_now_add = True, editable = False)

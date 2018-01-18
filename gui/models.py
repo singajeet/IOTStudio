@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from IOTStudio.settings import BASE_DIR
 from .gui_models import tags
 import os
+from polymorphic.models import PolymorphicModel 
 
 TEMPLATE_NAME = '<!-- Template Name: {0} -->'
 NEW_LINE = '\n'
@@ -56,8 +57,8 @@ class PanelModel(UIElementModel):
     def __str__(self):
         return '{0} ({1})'.format(self.name, dict(self.PANEL_TYPES)[self.panel_type])
         
-    def get_html():
-        pass
+    def get_html(self):
+        return ''
 
     class Meta:
         verbose_name = 'Panel'
@@ -79,8 +80,13 @@ class PlaceHolderModel(iot.BaseModel):
     def __str__(self):
         return '{0} ({1})'.format(self.name, dict(self.PLACE_HOLDER_TYPES)[self.place_holder_type])
 
-    def get_html():
-        pass
+    def get_html(self):
+        print('PlaceHolderModel: get_html')
+        return self.build_html()
+
+    def build_html(self):
+        print('PlaceHolderModel: build_html')
+        return ''
         
     class Meta:
         verbose_name = 'Placeholder'
@@ -92,9 +98,10 @@ class HtmlPlaceHolderModel(PlaceHolderModel):
     def __str__(self):
         return '{0} (HtmlPlaceholder)'.format(self.name)
         
-    def get_html():
+    def build_html(self):
+        print('HtmlPlaceHolder: build_html')
         html = ''
-        for html_tag in html_tags:
+        for html_tag in self.html_tags.all():
             html += html_tag.get_html()
             
         return html
@@ -109,9 +116,10 @@ class PanelPlaceHolderModel(PlaceHolderModel):
     def __str__(self):
         return '{0} (PanelPlaceholder)'.format(self.name)
 
-    def get_html():
+    def build_html(self):
+        print('PanelPlaceHolder: build_html')
         html = ''
-        for panel in panels:
+        for panel in self.panels.all():
             html += panel.get_html()
             
         return html
@@ -127,9 +135,10 @@ class SectionModel(iot.BaseModel):
     def __str__(self):
         return self.name
         
-    def get_html():
+    def get_html(self):
         html = ''
-        for place_holder in place_holders:
+        for place_holder in self.place_holders.all():
+            print(place_holder)
             html += place_holder.get_html()
             
         return html
@@ -146,9 +155,9 @@ class TemplateBlockModel(iot.BaseModel):
     def __str__(self):
         return self.name
 
-    def get_html():
+    def get_html(self):
         html = ''
-        for section in sections:
+        for section in self.sections.all():
             html += section.get_html()
             
         return html
