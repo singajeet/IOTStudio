@@ -19,6 +19,7 @@ BODY_END = '</body>' + NEW_LINE
 
 # Create your models here.
 class ApplicationModel(iot.BaseModel):    
+    is_active = models.BooleanField(default=False, help_text='Template under active app will be rendered for current app')
     version = models.CharField(max_length=20, blank=True, null=True)
     url = models.URLField(max_length=255, blank=True, null=True)
     company = models.CharField(max_length=255, blank=True, null=True)
