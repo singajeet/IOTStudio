@@ -5,6 +5,7 @@ from polymorphic.models import PolymorphicModel
 class BaseModel(PolymorphicModel):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255, unique = True)
+    sort_level = models.IntegerField(default=0)
     created_on_date = models.DateTimeField(auto_now_add = True, editable = False)
     modified_on_date = models.DateTimeField(auto_now = True, editable = False)
     security_id = models.ForeignKey('SecurityIdModel', models.SET_NULL, blank = True, null = True)
@@ -21,6 +22,7 @@ class SecurityIdModel(models.Model):
     name = models.CharField(max_length=255, unique = True)
     type = models.CharField(max_length=2, choices=OBJECT_TYPES, default='-1')
     value = models.CharField(max_length=255)
+    sort_level = models.IntegerField(default=0)
     created_on_date = models.DateTimeField(auto_now_add = True, editable = False)
     modified_on_date = models.DateTimeField(auto_now = True, editable = False)
     

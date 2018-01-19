@@ -100,7 +100,7 @@ class HtmlPlaceHolderModel(PlaceHolderModel):
         
     def build_html(self):
         html = ''
-        for html_tag in self.html_tags.all():
+        for html_tag in self.html_tags.all().order_by('sort_level'):
             html += html_tag.get_html()
             
         return html
@@ -117,7 +117,7 @@ class PanelPlaceHolderModel(PlaceHolderModel):
 
     def build_html(self):
         html = ''
-        for panel in self.panels.all():
+        for panel in self.panels.all().order_by('sort_level'):
             html += panel.get_html()
             
         return html
@@ -137,11 +137,11 @@ class SectionModel(iot.BaseModel):
         
     def get_html(self):
         html = ''
-        html += '' if self.header_html is None else self.header_html
-        for place_holder in self.place_holders.all():
+        html += ('' if self.header_html is None else self.header_html) + NEW_LINE
+        for place_holder in self.place_holders.all().order_by('sort_level'):
             html += place_holder.get_html()
             
-        html += '' if self.footer_html is None else self.footer_html
+        html += ('' if self.footer_html is None else self.footer_html) + NEW_LINE
         return html
 
     class Meta:
@@ -150,7 +150,9 @@ class SectionModel(iot.BaseModel):
 
 class TemplateBlockModel(iot.BaseModel):
     allow_change_in_child = models.BooleanField(default=False, help_text='If checked, block can be overwritten by child templates')
+    header_html = models.TextField(null = True, blank = True)
     sections = models.ManyToManyField(SectionModel, blank = True, related_name='+', default=None, help_text='Each block consist of 0 or more sections')
+    footer_html = models.TextField(null = True, blank = True)
     author = models.ForeignKey(User, models.SET_NULL, blank = True, null = True)
 
     def __str__(self):
@@ -158,9 +160,11 @@ class TemplateBlockModel(iot.BaseModel):
 
     def get_html(self):
         html = ''
-        for section in self.sections.all():
+        html += ('' if self.header_html is None else self.header_html) + NEW_LINE
+        for section in self.sections.all().order_by('sort_level'):
             html += section.get_html()
             
+        html += ('' if self.footer_html is None else self.footer_html) + NEW_LINE
         return html
         
     class Meta:
@@ -198,7 +202,7 @@ class TemplateModel(iot.BaseModel):
             #start Head tag
             html += HEAD_START        
             #Render all meta tags if available        
-            for meta_tag in self.meta_tags.all():
+            for meta_tag in self.meta_tags.all().order_by('sort_level'):
                 html += meta_tag.get_html()
                 
             html += NEW_LINE
@@ -207,15 +211,15 @@ class TemplateModel(iot.BaseModel):
             html += self.page_icon_tag.get_html('page_icon') + NEW_LINE        
             #Render title-tag 
             html += self.title_tag.get_html() + NEW_LINE        
-            #Render header-script-tags        
-            for script_tag in self.script_tags.all():
-                if script_tag.position == 'Header':
+            #Render header-script-tags
+            if self.script_tags.filter(position='00').exists():
+                for script_tag in self.script_tags.filter(position='00').order_by('sort_level'):
                     html += script_tag.get_html()
                 
-            html += NEW_LINE
+                html += NEW_LINE
             
             #Render header-style-tags        
-            for style_tag in self.style_tags.all():
+            for style_tag in self.style_tags.all().order_by('sort_level'):
                 html += style_tag.get_html()
             
             html += NEW_LINE
@@ -223,19 +227,19 @@ class TemplateModel(iot.BaseModel):
             #End Head tag
             html += HEAD_END        
             #Body start tag
-            html += BODY_START        
+            html += BODY_START + NEW_LINE        
             #Render all blocks        
-            for block_tag in self.block_tags.all():
+            for block_tag in self.block_tags.all().order_by('sort_level'):
                 html += block_tag.get_html()
             
             html += NEW_LINE
 
             #Render body script tags
-            for body_script in self.script_tags.all():
-                if body_script.position == 'Body':
+            if self.script_tags.filter(position='01').exists():
+                for body_script in self.script_tags.filter(position='01').order_by('sort_level'):
                     html += body_script.get_html()
 
-            html += NEW_LINE
+                html += NEW_LINE
 
             #Body end tag
             html += BODY_END        
