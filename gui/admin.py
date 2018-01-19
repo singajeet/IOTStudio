@@ -10,12 +10,17 @@ from django.contrib import admin
 
 @admin.register(models.ApplicationModel)
 class ApplicationModelAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'created_on_date', 'modified_on_date', 'is_active')
+    list_display = ('id', 'name', 'created_on_date', 'modified_on_date', 'is_active', 'sort_level')
     list_filter = ['name']
     search_fields = ['name']
     empty_value_display = '-empty-'
     list_display_links = ('id', 'name')
     save_as = True
+    fieldsets = (
+            (None, {'fields':('name', 'selected_template', 'is_active', 'sort_level', 'version', 'url', 'company')}),
+            ('Other Options', {'classes':('collapse',), 'fields':('security_id', 'author')}),
+            )
+    list_editable = ('sort_level',)
 
 @admin.register(models.ContentControlModel)
 class ContentControlModelAdmin(admin.ModelAdmin):
@@ -37,12 +42,24 @@ class ItemsControlModelAdmin(admin.ModelAdmin):
 
 @admin.register(models.TemplateModel)
 class TemplateModelAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'created_on_date', 'modified_on_date')
+    list_display = ('id', 'name', 'created_on_date', 'modified_on_date', 'sort_level')
     list_filter = ['name', 'template_type']
     search_fields = ['name', 'template_path']
     empty_value_display = '-empty-'
     list_display_links = ('id', 'name')
     save_as = True
+    fieldsets = (
+            (None, {'fields':('name', 'sort_level')}),
+            ('Template Type', {'fields':('template_type','template_path', 'template_applied_on')}),
+            ('Header', {'fields':('meta_tags', 'page_icon_tag', 'title_tag')}),
+            ('Header Scripts', {'fields':('script_tags',)}),
+            ('Header Styles', {'fields':('style_tags',)}),
+            ('Body', {'fields':('block_tags',)}),
+            ('Other Options', {'classes':('collapse',),'fields':('security_id', 'author')}),
+            )
+    filter_horizontal = ('meta_tags', 'script_tags', 'style_tags', 'block_tags',)
+    list_editable = ('sort_level',)
+    radio_fields = {'template_type':admin.VERTICAL}
     
 @admin.register(models.ControlStyleModel)
 class ControlStyleModelAdmin(admin.ModelAdmin):
