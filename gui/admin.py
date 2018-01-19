@@ -10,7 +10,7 @@ from django.contrib import admin
 
 @admin.register(models.ApplicationModel)
 class ApplicationModelAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'created_on_date', 'modified_on_date')
+    list_display = ('id', 'name', 'created_on_date', 'modified_on_date', 'is_active')
     list_filter = ['name']
     search_fields = ['name']
     empty_value_display = '-empty-'
@@ -73,7 +73,7 @@ class StyleTagModelAdmin(admin.ModelAdmin):
     
 @admin.register(tags.ScriptTagModel)
 class ScriptTagModelAdmin(admin.ModelAdmin):
-    list_display = ('id', 'tag_name', 'author', 'created_on_date', 'modified_on_date')
+    list_display = ('id', 'tag_name', 'author', 'created_on_date', 'modified_on_date', 'position')
     list_filter = ['tag_name', 'author']
     search_fields = ['tag_name', 'author', 'script_text']
     empty_value_display = '-empty-'

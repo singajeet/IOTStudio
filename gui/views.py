@@ -6,42 +6,16 @@ from django.http import HttpResponse
 from django.template import Template, Context
 from . import models
 import sys
-import textwrap
 # Create your views here.
 
 
-def no_app_active_msg(error_msg):
-    message = str(
-                    "<html>"
-                        "<head>"
-                            "<Title>"
-                                "No Active App Found!"
-                            "</Title>"
-                        "</head>"
-                        "<body>"
-                                "<div>"
-                                    "<center>"
-                                        "<h2>Unable to locate active App!</h2>"
-                                    "</center>"
-                                "</div>"
-                                "<div>"
-                                    "<center>"
-                                        "<div><h4>Please check your system <a href=\"/admin\">settings</a></h4></div>"
-                                        "<div><h4>and below message for more information...</h4></div>"
-                                        "<div>"
-                                        "</div>"
-                                    "</center>"
-                                "</div>"
-                            "</body>"
-                    "</html>"
-                    )
-    return message
-                    
 def index(request):
+    message = '<html><head><Title>No Active App Found!</Title></head><body><div><center><h2>Unable to locate active App!</h2></center></div><div><center><div><h4>Please check your system <a href="/admin">settings</a></h4></div><div><h4>and below message for more information...</h4></div><div>{0}</div></center></div></body></html>'
+
     try:
         app_details = models.ApplicationModel.objects.get(is_active=True)
     except:
-        return no_app_active_msg(sys.exc_info()[0])
+        return message.format(sys.exc_info()[0])
         
     if app_details is not None:
         template = models.TemplateModel.objects.get(id=app_details.selected_template.id)

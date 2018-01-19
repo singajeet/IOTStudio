@@ -72,8 +72,14 @@ class ScriptTagModel(models.Model):
             ('01', 'Inline'),
             ('02', 'Url'),
             )
+    POSITIONS=(
+            ('-1', 'None'),
+            ('00', 'Header'),
+            ('01', 'Body'),
+            )
     id = models.AutoField(primary_key=True)
     tag_name = models.CharField(max_length=255, unique = True)
+    position = models.CharField(max_length=2, default = '00', choices=POSITIONS)
     script_type = models.CharField(max_length = 2, choices=SCRIPT_TYPES, default='02')
     script_url = models.URLField(max_length=255, blank=True, null=True, help_text='Url to CDN location')
     script_file = models.FilePathField(path=os.path.join(BASE_DIR, 'staticfiles/js'), recursive=True, allow_folders=False, blank=True, null=True)

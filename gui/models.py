@@ -6,7 +6,8 @@ from django.contrib.auth.models import User
 from IOTStudio.settings import BASE_DIR
 from .gui_models import tags
 import os
-from polymorphic.models import PolymorphicModel 
+from polymorphic.models import PolymorphicModel
+from django.db.models.query_utils import Q
 
 TEMPLATE_NAME = '<!-- Template Name: {0} -->'
 NEW_LINE = '\n'
@@ -82,11 +83,9 @@ class PlaceHolderModel(iot.BaseModel):
         return '{0} ({1})'.format(self.name, dict(self.PLACE_HOLDER_TYPES)[self.place_holder_type])
 
     def get_html(self):
-        print('PlaceHolderModel: get_html')
         return self.build_html()
 
     def build_html(self):
-        print('PlaceHolderModel: build_html')
         return ''
         
     class Meta:
@@ -100,7 +99,6 @@ class HtmlPlaceHolderModel(PlaceHolderModel):
         return '{0} (HtmlPlaceholder)'.format(self.name)
         
     def build_html(self):
-        print('HtmlPlaceHolder: build_html')
         html = ''
         for html_tag in self.html_tags.all():
             html += html_tag.get_html()
@@ -118,7 +116,6 @@ class PanelPlaceHolderModel(PlaceHolderModel):
         return '{0} (PanelPlaceholder)'.format(self.name)
 
     def build_html(self):
-        print('PanelPlaceHolder: build_html')
         html = ''
         for panel in self.panels.all():
             html += panel.get_html()
@@ -130,7 +127,9 @@ class PanelPlaceHolderModel(PlaceHolderModel):
         verbose_name_plural = 'PanelPlaceholders'
 
 class SectionModel(iot.BaseModel):
+    header_html = models.TextField(null = True, blank = True)
     place_holders = models.ManyToManyField(PlaceHolderModel, blank = True, related_name = '+', default = None, help_text = 'Each section consist of 0 or more place holders of type HTML or panel')
+    footer_html = models.TextField(null = True, blank = True)
     author = models.ForeignKey(User, models.SET_NULL, blank = True, null = True)
 
     def __str__(self):
@@ -138,10 +137,11 @@ class SectionModel(iot.BaseModel):
         
     def get_html(self):
         html = ''
+        html += '' if self.header_html is None else self.header_html
         for place_holder in self.place_holders.all():
-            print(place_holder)
             html += place_holder.get_html()
             
+        html += '' if self.footer_html is None else self.footer_html
         return html
 
     class Meta:
@@ -178,8 +178,8 @@ class TemplateModel(iot.BaseModel):
     meta_tags = models.ManyToManyField(tags.HtmlTagModel, related_name='+', blank=True, default=None, limit_choices_to={'tag_name__contains':'Meta'})
     page_icon_tag = models.ForeignKey(tags.IconTagModel, models.SET_NULL, blank = True, null = True, default=None)
     title_tag = models.ForeignKey(tags.HtmlTagModel, models.SET_NULL, blank = True, null = True, default=None, limit_choices_to={'tag_name__contains':'Title'})
-    header_script_tags = models.ManyToManyField(tags.ScriptTagModel, blank=True, default=None, related_name='+')
-    header_style_tags = models.ManyToManyField(tags.StyleTagModel, blank=True, related_name='+', default=None)
+    script_tags = models.ManyToManyField(tags.ScriptTagModel, blank=True, default=None, related_name='+')
+    style_tags = models.ManyToManyField(tags.StyleTagModel, blank=True, related_name='+', default=None)
     block_tags = models.ManyToManyField(TemplateBlockModel, blank = True, related_name='+', default=None)
     template_applied_on = models.ForeignKey(ControlModel, models.SET_NULL, blank=True, null=True)
     author = models.ForeignKey(User, models.SET_NULL, blank = True, null = True)
@@ -208,13 +208,14 @@ class TemplateModel(iot.BaseModel):
             #Render title-tag 
             html += self.title_tag.get_html() + NEW_LINE        
             #Render header-script-tags        
-            for script_tag in self.header_script_tags.all():
-                html += script_tag.get_html()
+            for script_tag in self.script_tags.all():
+                if script_tag.position == 'Header':
+                    html += script_tag.get_html()
                 
             html += NEW_LINE
             
             #Render header-style-tags        
-            for style_tag in self.header_style_tags.all():
+            for style_tag in self.style_tags.all():
                 html += style_tag.get_html()
             
             html += NEW_LINE
@@ -228,7 +229,14 @@ class TemplateModel(iot.BaseModel):
                 html += block_tag.get_html()
             
             html += NEW_LINE
-            
+
+            #Render body script tags
+            for body_script in self.script_tags.all():
+                if body_script.position == 'Body':
+                    html += body_script.get_html()
+
+            html += NEW_LINE
+
             #Body end tag
             html += BODY_END        
             #HTML end tag
