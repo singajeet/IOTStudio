@@ -11,7 +11,7 @@ import textwrap
 
 
 def no_app_active_msg(error_msg):
-    message = string(
+    message = str(
                     "<html>"
                         "<head>"
                             "<Title>"
