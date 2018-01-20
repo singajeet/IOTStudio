@@ -66,10 +66,6 @@ class PanelModel(UIElementModel):
         verbose_name = 'Panel'
         verbose_name_plural = 'Panels'
 
-class ControlModel(UIElementModel):
-    control_type = models.CharField(max_length=255)
-    parent_id = models.ForeignKey('self', models.SET_NULL, blank=True, null=True)
-
 class PlaceHolderModel(iot.BaseModel):
     PLACE_HOLDER_TYPES=(
             ('-1', 'None'),
@@ -240,7 +236,7 @@ class TemplateModel(iot.BaseModel):
     script_tags = models.ManyToManyField(tags.ScriptTagModel, blank=True, default=None, related_name='+')
     style_tags = models.ManyToManyField(tags.StyleTagModel, blank=True, related_name='+', default=None)
     block_tags = models.ManyToManyField(TemplateBlockModel, blank = True, related_name='+', default=None)
-    template_applied_on = models.ForeignKey(ControlModel, models.SET_NULL, blank=True, null=True)
+    template_applied_on = models.ForeignKey('ControlModel', models.SET_NULL, blank=True, null=True)
     author = models.ForeignKey(User, models.SET_NULL, blank = True, null = True)
     
     def __str__(self):
@@ -307,6 +303,10 @@ class TemplateModel(iot.BaseModel):
         verbose_name = "Template"
         verbose_name_plural = "Templates"
 
+class ControlModel(UIElementModel):    
+    control_type = models.CharField(max_length=255)
+    parent_id = models.ForeignKey('self', models.SET_NULL, blank=True, null=True)
+    
 class ControlStyleModel(iot.BaseModel):
     STYLES=(
             ('-1', 'None'),
@@ -325,10 +325,10 @@ class ControlStyleModel(iot.BaseModel):
         verbose_name = 'ControlStyle'
         verbose_name_plural = 'ControlStyles'
 
-class ContentControlModel(ControlModel):        
+class ContentControlModel(ControlModel):    
     template = models.ForeignKey(TemplateModel, models.SET_NULL, blank = True, null = True)
     style = models.ForeignKey(ControlStyleModel, models.SET_NULL, blank = True, null = True)
-    content = models.ForeignKey('self', models.SET_NULL, blank = True, null = True)
+    content = models.ManyToManyField(TemplateBlockModel, related_name='+', blank = True)
     author = models.ForeignKey(User, models.SET_NULL, blank = True, null = True)
     
     def __str__(self):

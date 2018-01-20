@@ -12,10 +12,18 @@ from . import iot
 
 
 class HtmlTagModel(models.Model):
+    TAG_TYPES=(
+            ('-1', 'None'),
+            ('00', 'Div'),
+            ('00', 'Span'),
+            )
     id = models.AutoField(primary_key=True)
     tag_name = models.CharField(max_length=255, unique = True)
     tag_text = models.TextField()
     sort_level = models.IntegerField(default=0)
+    slug = models.SlugField(max_length=300, unique = True, blank = True, null = True)
+    tag_type = models.CharField(max_length=2, choices=TAG_TYPES, default='-1')
+    css_classes = models.CharField(max_length=100, blank=True, null=True) 
     created_on_date = models.DateTimeField(auto_now_add = True, editable = False)    
     modified_on_date = models.DateTimeField(auto_now = True, editable = False)
     author = models.ForeignKey(User, blank=True, null=True)
@@ -44,6 +52,7 @@ class StyleTagModel(models.Model):
     style_text = models.TextField(blank=True, null=True)
     style_file = models.FilePathField(path=os.path.join(BASE_DIR, 'staticfiles/css'), recursive = True, allow_folders = False, blank = True, null = True)
     sort_level = models.IntegerField(default=0)
+    slug = models.SlugField(max_length=300, unique = True, blank = True, null = True)
     created_on_date = models.DateTimeField(auto_now_add = True, editable = False)
     modified_on_date = models.DateTimeField(auto_now = True, editable = False)
     author = models.ForeignKey(User, blank=True, null=True)
@@ -125,6 +134,7 @@ class IconTagModel(models.Model):
     icon_file = models.FilePathField(path=os.path.join(BASE_DIR, 'staticfiles/img'), recursive=True, allow_folders=False, blank=True, null=True)
     icon_text = models.TextField(blank=True, null=True)
     sort_level = models.IntegerField(default=0)
+    slug = models.SlugField(max_length=300, unique = True, blank = True, null = True)
     created_on_date = models.DateTimeField(auto_now_add = True, editable = False)
     modified_on_date = models.DateTimeField(auto_now = True, editable = False)
     author = models.ForeignKey(User, blank=True, null=True)
