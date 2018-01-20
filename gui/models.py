@@ -76,7 +76,14 @@ class PlaceHolderModel(iot.BaseModel):
             ('00', 'HTML'),
             ('01', 'Panel'),
             )
+    TAG_TYPES=(
+            ('-1', 'None'),
+            ('00', 'Div'),
+            ('00', 'Span'),
+            )
     place_holder_type = models.CharField(max_length=2, choices = PLACE_HOLDER_TYPES, default='00')
+    tag_type = models.CharField(max_length=2, choices=TAG_TYPES, default='00')
+    css_classes = models.CharField(max_length=100, blank=True, null=True)
     author = models.ForeignKey(User, models.SET_NULL, blank = True, null = True)
 
     def __str__(self):
@@ -100,9 +107,21 @@ class HtmlPlaceHolderModel(PlaceHolderModel):
         
     def build_html(self):
         html = ''
+        pre_tag = '<{0} id="{1}" class="{2}" >'
+        post_tag = '</{0}>'
+        if self.tag_type == '00':
+            pre_tag = pre_tag.format('div', self.slug, self.css_classes)
+            post_tag = post_tag.format('div')
+        if self.tag_type == '01':
+            post_tag = post_tag.format('span', self.slug, self.css_classes)
+        if self.tag_type != '-1':
+            html += pre_tag
         for html_tag in self.html_tags.all().order_by('sort_level'):
             html += html_tag.get_html()
             
+        if self.tag_type != '-1':
+            html += post_tag
+
         return html
 
     class Meta:
@@ -127,6 +146,13 @@ class PanelPlaceHolderModel(PlaceHolderModel):
         verbose_name_plural = 'PanelPlaceholders'
 
 class SectionModel(iot.BaseModel):
+    TAG_TYPES=(
+            ('-1', 'None'),
+            ('00', 'Div'),
+            ('00', 'Span'),
+            )
+    tag_type = models.CharField(max_length=2, choices=TAG_TYPES, default='00')
+    css_classes = models.CharField(max_length=100, blank=True, null=True)
     header_html = models.TextField(null = True, blank = True)
     place_holders = models.ManyToManyField(PlaceHolderModel, blank = True, related_name = '+', default = None, help_text = 'Each section consist of 0 or more place holders of type HTML or panel')
     footer_html = models.TextField(null = True, blank = True)
@@ -137,11 +163,22 @@ class SectionModel(iot.BaseModel):
         
     def get_html(self):
         html = ''
+        pre_tag = '<{0} id="{1}" class="{2}" >'
+        post_tag = '</{0}>'
+        if self.tag_type == '00':
+            pre_tag = pre_tag.format('div', self.slug, self.css_classes)
+            post_tag = post_tag.format('div')
+        if self.tag_type == '01':
+            post_tag = post_tag.format('span', self.slug, self.css_classes)
+        if self.tag_type != '-1':
+            html += pre_tag
         html += ('' if self.header_html is None else self.header_html) + NEW_LINE
         for place_holder in self.place_holders.all().order_by('sort_level'):
             html += place_holder.get_html()
             
         html += ('' if self.footer_html is None else self.footer_html) + NEW_LINE
+        if self.tag_type != '-1':
+            html += post_tag
         return html
 
     class Meta:
@@ -149,6 +186,13 @@ class SectionModel(iot.BaseModel):
         verbose_name_plural = 'Sections'
 
 class TemplateBlockModel(iot.BaseModel):
+    TAG_TYPES=(
+            ('-1', 'None'),
+            ('00', 'Div'),
+            ('00', 'Span'),
+            )
+    tag_type = models.CharField(max_length=2, choices=TAG_TYPES, default='00')
+    css_classes = models.CharField(max_length=100, blank=True, null=True)
     allow_change_in_child = models.BooleanField(default=False, help_text='If checked, block can be overwritten by child templates')
     header_html = models.TextField(null = True, blank = True)
     sections = models.ManyToManyField(SectionModel, blank = True, related_name='+', default=None, help_text='Each block consist of 0 or more sections')
@@ -160,11 +204,22 @@ class TemplateBlockModel(iot.BaseModel):
 
     def get_html(self):
         html = ''
+        pre_tag = '<{0} id="{1}" class="{2}" >' + NEW_LINE          
+        post_tag = '</{0}>'
+        if self.tag_type == '00':
+            pre_tag = pre_tag.format('div', self.slug, self.css_classes)
+            post_tag = post_tag.format('div')
+        if self.tag_type == '01':
+            post_tag = post_tag.format('span', self.slug, self.css_classes)
+        if self.tag_type != '-1':
+            html += pre_tag
         html += ('' if self.header_html is None else self.header_html) + NEW_LINE
         for section in self.sections.all().order_by('sort_level'):
             html += section.get_html()
             
         html += ('' if self.footer_html is None else self.footer_html) + NEW_LINE
+        if self.tag_type != '-1':
+            html += post_tag + NEW_LINE
         return html
         
     class Meta:

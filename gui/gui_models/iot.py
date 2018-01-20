@@ -5,6 +5,7 @@ from polymorphic.models import PolymorphicModel
 class BaseModel(PolymorphicModel):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=255, unique = True)
+    slug = models.SlugField(max_length=300, unique=True, blank=True, null=True)
     sort_level = models.IntegerField(default=0)
     created_on_date = models.DateTimeField(auto_now_add = True, editable = False)
     modified_on_date = models.DateTimeField(auto_now = True, editable = False)

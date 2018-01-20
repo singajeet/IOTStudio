@@ -72,12 +72,15 @@ class ControlStyleModelAdmin(admin.ModelAdmin):
     
 @admin.register(tags.HtmlTagModel)
 class HtmlTagModelAdmin(admin.ModelAdmin):
-    list_display = ('id', 'tag_name', 'author', 'created_on_date', 'modified_on_date')
+    list_display = ('id', 'tag_name', 'author', 'slug', 'sort_level', 'created_on_date', 'modified_on_date')
     list_filter = ['tag_name', 'author']
-    search_fields = ['tag_name', 'author', 'tag_text']
+    search_fields = ['tag_name', 'author', 'tag_text', 'slug']
     empty_value_display = '-empty-'
     list_display_links = ('id', 'tag_name')
     save_as = True
+    fieldsets = (
+            (None, {'fields':}),
+            )
     
 @admin.register(tags.StyleTagModel)
 class StyleTagModelAdmin(admin.ModelAdmin):
