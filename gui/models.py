@@ -75,7 +75,7 @@ class PlaceHolderModel(iot.BaseModel):
     TAG_TYPES=(
             ('-1', 'None'),
             ('00', 'Div'),
-            ('00', 'Span'),
+            ('01', 'Span'),
             )
     place_holder_type = models.CharField(max_length=2, choices = PLACE_HOLDER_TYPES, default='00')
     tag_type = models.CharField(max_length=2, choices=TAG_TYPES, default='00')
@@ -109,7 +109,8 @@ class HtmlPlaceHolderModel(PlaceHolderModel):
             pre_tag = pre_tag.format('div', self.slug, self.css_classes)
             post_tag = post_tag.format('div')
         if self.tag_type == '01':
-            post_tag = post_tag.format('span', self.slug, self.css_classes)
+            pre_tag = pre_tag.format('span', self.slug, self.css_classes)
+            post_tag = post_tag.format('span')
         if self.tag_type != '-1':
             html += pre_tag
         for html_tag in self.html_tags.all().order_by('sort_level'):
@@ -145,7 +146,7 @@ class SectionModel(iot.BaseModel):
     TAG_TYPES=(
             ('-1', 'None'),
             ('00', 'Div'),
-            ('00', 'Span'),
+            ('01', 'Span'),
             )
     tag_type = models.CharField(max_length=2, choices=TAG_TYPES, default='00')
     css_classes = models.CharField(max_length=100, blank=True, null=True)
@@ -165,7 +166,8 @@ class SectionModel(iot.BaseModel):
             pre_tag = pre_tag.format('div', self.slug, self.css_classes)
             post_tag = post_tag.format('div')
         if self.tag_type == '01':
-            post_tag = post_tag.format('span', self.slug, self.css_classes)
+            pre_tag = pre_tag.format('span', self.slug, self.css_classes)
+            post_tag = post_tag.format('span')
         if self.tag_type != '-1':
             html += pre_tag
         html += ('' if self.header_html is None else self.header_html) + NEW_LINE
@@ -185,13 +187,16 @@ class TemplateBlockModel(iot.BaseModel):
     TAG_TYPES=(
             ('-1', 'None'),
             ('00', 'Div'),
-            ('00', 'Span'),
+            ('01', 'Span'),
+            ('02', 'Header'),
+            ('03', 'Main'),
             )
     tag_type = models.CharField(max_length=2, choices=TAG_TYPES, default='00')
     css_classes = models.CharField(max_length=100, blank=True, null=True)
     allow_change_in_child = models.BooleanField(default=False, help_text='If checked, block can be overwritten by child templates')
     header_html = models.TextField(null = True, blank = True)
     sections = models.ManyToManyField(SectionModel, blank = True, related_name='+', default=None, help_text='Each block consist of 0 or more sections')
+    child_blocks = models.ManyToManyField('self', blank=True, related_name='+', default=None)
     footer_html = models.TextField(null = True, blank = True)
     author = models.ForeignKey(User, models.SET_NULL, blank = True, null = True)
 
@@ -206,12 +211,21 @@ class TemplateBlockModel(iot.BaseModel):
             pre_tag = pre_tag.format('div', self.slug, self.css_classes)
             post_tag = post_tag.format('div')
         if self.tag_type == '01':
-            post_tag = post_tag.format('span', self.slug, self.css_classes)
+            pre_tag = pre_tag.format('span', self.slug, self.css_classes)
+            post_tag = post_tag.format('span')
+        if self.tag_type == '02':
+            pre_tag = pre_tag.format('header', self.slug, self.css_classes)
+            post_tag = post_tag.format('header')
+        if self.tag_type == '03':
+            pre_tag = pre_tag.format('main', self.slug, self.css_classes)
+            post_tag = post_tag.format('main')
         if self.tag_type != '-1':
             html += pre_tag
         html += ('' if self.header_html is None else self.header_html) + NEW_LINE
         for section in self.sections.all().order_by('sort_level'):
             html += section.get_html()
+        for child_block in self.child_blocks.all().order_by('sort_level'):
+            html += child_block.get_html()
             
         html += ('' if self.footer_html is None else self.footer_html) + NEW_LINE
         if self.tag_type != '-1':

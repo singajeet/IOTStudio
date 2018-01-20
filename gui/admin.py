@@ -129,7 +129,7 @@ class TemplateModelAdmin(admin.ModelAdmin):
     save_as = True
     fieldsets = (
             (None, 
-                {'fields':('name', 'sort_level')
+                {'fields':('name', 'sort_level','slug')
                 }
             ),
             ('Template Type', 
@@ -218,12 +218,30 @@ class StyleTagModelAdmin(admin.ModelAdmin):
     
 @admin.register(tags.ScriptTagModel)
 class ScriptTagModelAdmin(admin.ModelAdmin):
-    list_display = ('id', 'tag_name', 'author', 'created_on_date', 'modified_on_date', 'position')
+    list_display = ('id', 'tag_name', 'author', 'sort_level', 'slug', 'position', 'created_on_date', 'modified_on_date')
     list_filter = ['tag_name', 'author']
     search_fields = ['tag_name', 'author', 'script_text']
     empty_value_display = '-empty-'
     list_display_links = ('id', 'tag_name')
     save_as = True
+    fieldsets = (
+            (None,
+                {'fields':('tag_name', 'sort_level', 'slug')
+                 }
+            ),
+            ('Script',
+                {'fields':('script_type', 'script_file', 'script_url', 'script_text', 'position')
+                }
+            ),
+            ('Other Options',
+                {'fields':('security_id', 'author'),
+                'classes':('collapse'),
+                }
+            ),
+    )
+    list_editable = ('sort_level', 'slug', 'position')
+    radio_fields = {'script_type':admin.VERTICAL}
+    prepopulated_fields={'slug':('tag_name',)}
 
 @admin.register(tags.IconTagModel)
 class IconTagModelAdmin(admin.ModelAdmin):
@@ -235,7 +253,7 @@ class IconTagModelAdmin(admin.ModelAdmin):
     save_as = True
     fieldsets = (
         (None,
-            {'fields':('name', 'sort_level', 'slug')
+            {'fields':('tag_name', 'sort_level', 'slug')
             }
         ),
         ('Icon Details',
@@ -255,21 +273,57 @@ class IconTagModelAdmin(admin.ModelAdmin):
     
 @admin.register(models.SectionModel)
 class SectionModelAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'author', 'created_on_date', 'modified_on_date')
+    list_display = ('id', 'name', 'author', 'sort_level' ,'slug', 'created_on_date', 'modified_on_date')
     list_filter = ['name', 'author']
     search_fields = ['name', 'author']
     empty_value_display = '-empty-'
     list_display_links = ('id', 'name')
     save_as = True
+    fieldsets = (
+        (None,
+            {'fields':('name', 'sort_level', 'slug', 'tag_type')
+            }
+        ),
+        ('Section',
+            {'fields':('css_classes', 'header_html', 'place_holders', 'footer_html')
+            }
+        ),
+        ('Other Options',
+            {'fields':('security_id', 'author'),
+            'classes':('collapse',)
+            }
+        )
+    )
+    list_editable = ('sort_level', 'slug')
+    prepopulated_fields = {'slug':('name',)}
+    filter_horizontal = ('place_holders',)
     
 @admin.register(models.PanelPlaceHolderModel)
 class PanelPlaceHolderModelAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'author', 'created_on_date', 'modified_on_date')
+    list_display = ('id', 'name', 'author', 'sort_level', 'slug', 'created_on_date', 'modified_on_date')
     list_filter = ['name', 'author']
     search_fields = ['name', 'author']
     empty_value_display = '-empty-'
     list_display_links = ('id', 'name')
     save_as = True
+    fieldsets = (
+        (None,
+            {'fields':('name', 'sort_level', 'slug', 'tag_type')
+            }
+        ),  
+        ('Panel',
+            {'fields':('css_classes', 'panels')
+            }
+        ),
+        ('Other Settings',
+            {'fields':('security_id', 'author'),
+            'classes':('collapse',)
+            }
+        ),
+    )
+    list_editable = ('sort_level', 'slug')
+    prepopulated_fields = {'slug':('name',)}
+    filter_horizontal = ('panels',)
     
 @admin.register(models.HtmlPlaceHolderModel)
 class HtmlPlaceHolderModelAdmin(admin.ModelAdmin):
@@ -300,18 +354,54 @@ class HtmlPlaceHolderModelAdmin(admin.ModelAdmin):
     
 @admin.register(models.PanelModel)
 class PanelModelAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'author', 'created_on_date', 'modified_on_date')
+    list_display = ('id', 'name', 'author', 'sort_level', 'slug', 'created_on_date', 'modified_on_date')
     list_filter = ['name', 'author']
     search_fields = ['name', 'author']
     empty_value_display = '-empty-'
     list_display_links = ('id', 'name')
     save_as = True
+    fieldsets = (
+        (None,
+            {'fields':('name', 'sort_level', 'slug')
+            }
+        ),
+        ('Panel',
+            {'fields':('panel_type', 'parent_id', 'children')
+            }
+        ),
+        ('Other Options',
+            {'fields':('security_id', 'author')
+            }
+        )
+    )
+    list_editable = ('sort_level', 'slug')
+    prepopulated_fields = {'slug':('name',)}
+    filter_horizontal = ('children',)
     
 @admin.register(models.TemplateBlockModel)
 class TemplateBlockModelAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'author', 'created_on_date', 'modified_on_date')
+    list_display = ('id', 'name', 'author', 'sort_level', 'slug', 'created_on_date', 'modified_on_date')
     list_filter = ['name', 'author']
     search_fields = ['name', 'author']
     empty_value_display = '-empty-'
     list_display_links = ('id', 'name')
     save_as = True
+    fieldsets = (
+            (None,
+                {'fields':('name', 'sort_level', 'slug', 'tag_type')
+                }
+            ),
+            ('Block',
+                {'fields':('allow_change_in_child', 'css_classes', 'header_html', 'sections', 'child_blocks', 'footer_html')
+                }
+            ),
+            ('Other Options',
+                {'fields':('security_id', 'author'),
+                'classes':('collapse',)
+                }
+            )
+    )
+    list_editable = ('sort_level', 'slug')
+    prepopulated_fields = {'slug':('name',)}
+    filter_horizontal = ('sections','child_blocks')
+
