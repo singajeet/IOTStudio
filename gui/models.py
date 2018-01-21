@@ -16,6 +16,8 @@ NAV = 'nav'
 HEADER = 'header'
 MAIN = 'main'
 HTML = 'Html'
+ASIDE = 'aside'
+FOOTER = 'footer'
 PANEL = 'Panel'
 STACK_PANEL = 'StackPanel'
 FLOW_LAYOUT_PANEL = 'FlowLayoutPanel'
@@ -185,6 +187,8 @@ class SectionModel(iot.BaseModel):
             (_02, HEADER),
             (_03, MAIN),
             (_04, NAV),
+            (_05, ASIDE),
+            (_06, FOOTER),
             )
     tag_type = models.CharField(max_length=2, choices=TAG_TYPES, default=_00)
     css_classes = models.CharField(max_length=100, blank=True, null=True)
@@ -216,10 +220,16 @@ class SectionModel(iot.BaseModel):
         if self.tag_type == _04:
             pre_tag = pre_tag.format(NAV, self.slug, self.css_classes)
             post_tag = post_tag.format(NAV)
+        if self.tag_type == _05:
+            pre_tag = pre_tag.format(ASIDE, self.slug, self.css_classes)
+            post_tag = post_tag.format(ASIDE)
+        if self.tag_type == _06:
+            pre_tag = pre_tag.format(FOOTER, self.slug, self.css_classes)
+            post_tag = post_tag.format(FOOTER)
         if self.tag_type != _MINUS_1:
             html += pre_tag
         #render header html if provided
-        html += '' if self.header_html is None else (self.header_html + NEW_LINE)
+        html += '' if (self.header_html is None or self.header_html == '') else (self.header_html + NEW_LINE)
         #render all place holders
         for place_holder in self.place_holders.all().order_by(SORT_LEVEL):
             html += place_holder.get_html()
@@ -227,7 +237,7 @@ class SectionModel(iot.BaseModel):
         if self.place_holders.count() > 0:
             html += NEW_LINE
         #render footer html if provided
-        html += '' if self.footer_html is None else (self.footer_html + NEW_LINE)
+        html += '' if (self.footer_html is None or self.footer_html == '') else (self.footer_html + NEW_LINE)
         if self.tag_type != _MINUS_1:
             html += post_tag + NEW_LINE
             
@@ -246,6 +256,8 @@ class TemplateBlockModel(iot.BaseModel):
             (_02, HEADER),
             (_03, MAIN),
             (_04, NAV),
+            (_05, ASIDE),
+            (_06, FOOTER),
             )
     tag_type = models.CharField(max_length=2, choices=TAG_TYPES, default=_00)
     css_classes = models.CharField(max_length=100, blank=True, null=True)
@@ -282,6 +294,12 @@ class TemplateBlockModel(iot.BaseModel):
         if self.tag_type == _04:
             pre_tag = pre_tag.format(NAV, self.slug, self.css_classes)
             post_tag = post_tag.format(NAV)
+        if self.tag_type == _05:
+            pre_tag = pre_tag.format(ASIDE, self.slug, self.css_classes)
+            post_tag = post_tag.format(ASIDE)
+        if self.tag_type == _06:
+            pre_tag = pre_tag.format(FOOTER, self.slug, self.css_classes)
+            post_tag = post_tag.format(FOOTER)
         #if a valid html tag is selected, render it else nothing is rendered
         if self.tag_type != _MINUS_1:
             html += pre_tag
@@ -299,7 +317,7 @@ class TemplateBlockModel(iot.BaseModel):
         #if child blocks were rendered, print a NewLine to have footer rendered in next line
         if self.child_blocks.count() > 0:
             html += NEW_LINE    
-        html += '' if self.footer_html is None else (self.footer_html + NEW_LINE)
+        html += '' if (self.footer_html is None or self.footer_html == '') else (self.footer_html + NEW_LINE)
         if self.tag_type != _MINUS_1:
             html += post_tag + NEW_LINE
         
